@@ -38,7 +38,7 @@ CREATE TABLE CreditCard(
 	expDate DATE,
 	name CHAR(20),
 	secCode TINYINT UNSIGNED,
-	number CHAR(16),
+	number CHAR(19),
 	PRIMARY KEY(number));
 	
 CREATE TABLE CustPossesCard(
