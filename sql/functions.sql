@@ -1,7 +1,9 @@
 -- SQL statement for the user functions
 -- For Customers
 -- New user account registration
-	SELECT email FROM Custmomer WHERE email != 'ronvel1502@gmail.com'
+
+SELECT email FROM Custmomer WHERE email != 'ronvel1502@gmail.com'
+
 INSERT INTO Customer(email ,custName, phoneNo, zipCode, street, city, state, password)
 VALUES('ronvel1502@gmail', 'Ronald' , '479-301-0649', 72701, '900 N Leverett Ave.', 'Fayetteville', 'Arkansas', 'unknown');
 

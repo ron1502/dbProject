@@ -1,15 +1,4 @@
-re-- Created by Ronald Velasquez 9/30/19
--- Updated 10/6/19
-	-- Missing junction tables added
--- Update 10/7/19
-	-- Change name of placedOrder to placeOrder
-	-- Rearrange the Dropping section
-	-- Added Review Entity
-	-- Added avrgRating attribute to Book
---Update 10/8/19
-	-- AuthLName attribute removed
-	
-USE id11009435_dbbookstore;	
+USE id11009435_dbbookstore
 	DROP TABLE IF EXISTS cartContBooks;
 	DROP TABLE IF EXISTS ShoppingCartManage;
     DROP TABLE IF EXISTS employeeMonMan;
