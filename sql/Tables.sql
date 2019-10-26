@@ -1,4 +1,5 @@
-USE id11009435_dbbookstore
+USE localdb;
+
 	DROP TABLE IF EXISTS cartContBooks;
 	DROP TABLE IF EXISTS ShoppingCartManage;
     DROP TABLE IF EXISTS employeeMonMan;
@@ -6,32 +7,33 @@ USE id11009435_dbbookstore
 	DROP TABLE IF EXISTS placeOrder;
 	DROP TABLE IF EXISTS CustPossesCard;
 	DROP TABLE IF EXISTS CreditCard;
+	DROP TABLE IF EXISTS review;
 	DROP TABLE IF EXISTS Book;
     DROP TABLE IF EXISTS Customer;
     
 CREATE TABLE Customer(
 	email CHAR(25),
-	custName CHAR(20),
-	phoneNo CHAR(12),
+	custName VARCHAR(20),
+	phoneNo VARCHAR(12),
 	zipCode MEDIUMINT UNSIGNED,
-	street CHAR(30),
-	city CHAR(20),
-	state CHAR(10),
+	street VARCHAR(30),
+	city VARCHAR(20),
+	state VARCHAR(10),
 	accID INTEGER UNSIGNED ZEROFILL AUTO_INCREMENT,
-	password CHAR(30),
+	password VARCHAR(30),
 	rwdPoint INTEGER,
 	PRIMARY KEY(accID),
 	UNIQUE(eMail));
 	
 CREATE TABLE CreditCard(
 	expDate DATE,
-	name CHAR(20),
-	secCode TINYINT UNSIGNED,
-	number CHAR(19),
+	name VARCHAR(20),
+	secCode SMALLINT UNSIGNED,
+	number CHAR(20),
 	PRIMARY KEY(number));
 	
 CREATE TABLE CustPossesCard(
-	number CHAR(16),
+	number CHAR(20),
 	accID INTEGER UNSIGNED ZEROFILL AUTO_INCREMENT,
 	PRIMARY KEY(number, accID),
 	FOREIGN KEY (number) REFERENCES CreditCard(number),
@@ -40,8 +42,8 @@ CREATE TABLE CustPossesCard(
 	
 CREATE TABLE ShoppingCartManage(
 	cName CHAR(20),
-	dateCrate DATE,
-	dateUpadated DATE,
+	dateCreated DATE,
+	dateUpdated DATE,
 	cartID INTEGER UNSIGNED ZEROFILL AUTO_INCREMENT,
 	accID INTEGER UNSIGNED,
 	PRIMARY KEY(cartID),
@@ -50,13 +52,13 @@ CREATE TABLE ShoppingCartManage(
 	
 -- If we define specific categories "category" can be turned into an ENUM
 CREATE TABLE Book(
-	category CHAR(10),
-	autName CHAR(30),
+	category VARCHAR(30),
+	autName VARCHAR(30),
 	year 	SMALLINT UNSIGNED,
 	ISBN	CHAR(30),
-	title	CHAR(20),
+	title	VARCHAR(100),
 	edition	TINYINT UNSIGNED,
-	publisher CHAR(20),
+	publisher VARCHAR(50),
 	stock INTEGER UNSIGNED,
 	avrgRating FLOAT,
 	price FLOAT,
