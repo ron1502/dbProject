@@ -12,7 +12,7 @@ USE localdb;
     DROP TABLE IF EXISTS Customer;
     
 CREATE TABLE Customer(
-	email CHAR(25),
+	email VARCHAR(25),
 	custName VARCHAR(20),
 	phoneNo VARCHAR(12),
 	zipCode MEDIUMINT UNSIGNED,
