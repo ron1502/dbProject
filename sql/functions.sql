@@ -3,6 +3,7 @@
 -- New user account registration
 
 DROP PROCEDURE IF EXISTS newUser;
+DROP PROCEDURE IF EXISTS logIn;
 
 DELIMITER $$
 
@@ -34,17 +35,22 @@ END $$
 
 DELIMITER ;
 -- User login
-	SELECT accID FROM Customer 
-		WHERE email = 'ronvel1502@gmail' AND password = 'unknown';
+
+CREATE PROCEDURE logIn(
+	IN email VARCHAR(25),
+	IN password VARCHAR(32),
+	OUT accID INTEGER UNSIGNED)
+BEGIN
+	SELECT C.accID FROM Customer C WHERE C.email = email AND C.password = MD5(password) INTO accID;
+END $$
 
 -- User can update his address, password etc.
 UPDATE Customer 
-SET zipCode = 72722, street = 'Garland', city =  'New York City', state = 'New York', password = 'NewUnknown', phoneNo = '479-333-666'
+SET zipCode = 72722, street = 'Garland', city =  'New York City', state = 'New York', password = MD5('NewUnknown'), phoneNo = '479-333-666'
 	WHERE accID = 1;
 
 -- Book search (by author name, title, category, year or combinations)
 SELECT ISBN, title FROM Book
-WHERE autName = 'Ricardo', title = 'The ball hurt me', category = 'Horror', year = 1990;
 		
 SELECT ISBN, title FROM Book
 	WHERE autName = 'Robert', title = 'Are you reading?', category = 'Comedy';
