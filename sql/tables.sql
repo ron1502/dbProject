@@ -2,14 +2,14 @@ USE localdb;
 
 	DROP TABLE IF EXISTS cartContBooks;
 	DROP TABLE IF EXISTS ShoppingCartManage;
-    DROP TABLE IF EXISTS employeeMonMan;
+    	DROP TABLE IF EXISTS employeeMonMan;
 	DROP TABLE IF EXISTS OrdContBook;
 	DROP TABLE IF EXISTS placeOrder;
 	DROP TABLE IF EXISTS CustPossesCard;
 	DROP TABLE IF EXISTS CreditCard;
 	DROP TABLE IF EXISTS review;
 	DROP TABLE IF EXISTS Book;
-    DROP TABLE IF EXISTS Customer;
+    	DROP TABLE IF EXISTS Customer;
     
 CREATE TABLE Customer(
 	email VARCHAR(25),
@@ -21,7 +21,7 @@ CREATE TABLE Customer(
 	state VARCHAR(10),
 	accID INTEGER UNSIGNED ZEROFILL AUTO_INCREMENT,
 	password VARCHAR(30),
-	rwdPoint INTEGER,
+	rwdPoint INTEGER DEFAULT 0,
 	PRIMARY KEY(accID),
 	UNIQUE(eMail));
 	
