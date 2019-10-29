@@ -2,11 +2,37 @@
 -- For Customers
 -- New user account registration
 
-SELECT email FROM Custmomer WHERE email != 'ronvel1502@gmail.com'
+DROP PROCEDURE IF EXISTS newUser;
 
-INSERT INTO Customer(email ,custName, phoneNo, zipCode, street, city, state, password)
-VALUES('ronvel1502@gmail', 'Ronald' , '479-301-0649', 72701, '900 N Leverett Ave.', 'Fayetteville', 'Arkansas', 'unknown');
+DELIMITER $$
 
+CREATE PROCEDURE newUser(
+	IN email VARCHAR(25),
+	IN custName VARCHAR(20),
+	IN phoneNo VARCHAR(12),
+	IN zipCode MEDIUMINT UNSIGNED,
+	IN street VARCHAR(30),
+	IN city VARCHAR(20),
+	IN state VARCHAR(10),
+	IN password VARCHAR(32),
+	OUT error VARCHAR(2),
+	OUT accID INTEGER UNSIGNED) 
+
+BEGIN
+	DECLARE hPassword VARCHAR(32);
+	IF EXISTS(SELECT C.email FROM Customer C WHERE C.email = email) THEN
+		SET error = "E";
+		SET accID = 0;
+	ELSE
+		SELECT MD5(password) INTO hPassword;
+		INSERT INTO Customer(email ,custName, phoneNo, zipCode, street, city, state, password)
+		VALUES(email ,custName, phoneNo, zipCode, street, city, state, hPassword);
+		SELECT LAST_INSERT_ID() INTO accID;
+		SET error = "S";
+	END IF;
+END $$
+
+DELIMITER ;
 -- User login
 	SELECT accID FROM Customer 
 		WHERE email = 'ronvel1502@gmail' AND password = 'unknown';
