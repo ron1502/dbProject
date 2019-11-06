@@ -50,13 +50,12 @@ SET zipCode = 72722, street = 'Garland', city =  'New York City', state = 'New Y
 	WHERE accID = 1;
 
 -- Book search (by author name, title, category, year or combinations)
-SELECT ISBN, title FROM Book
+	-- For performance reasons most of the query is going to be implemented in the front end
+	-- WHERE condition is going to be built by putting every aspect of the search together in the front end
+	
+	SELECT ISBN, title FROM Book
+	WHERE autName = 'Stephan Pentak', title = 'Design Basics', category = 'Art & Photography';
 		
-SELECT ISBN, title FROM Book
-	WHERE autName = 'Robert', title = 'Are you reading?', category = 'Comedy';
-		
--- For other combinations, it is only needed to add or remove attribute from the WHERE statement.
-
 -- Create one empty order or shopping cart
 	-- Shopping Cart
 	INSERT INTO ShoppingCartManage(cName, dateCreate, dateUpdated, accID)
