@@ -5,6 +5,8 @@
 	DROP PROCEDURE IF EXISTS newUser;
 	DROP PROCEDURE IF EXISTS logIn;
 	DROP PROCEDURE IF EXISTS mergeCart;
+	DROP PROCEDURE IF EXISTS applyRwdPoints;
+	DROP PROCEDURE IF EXISTS cartToOrder;
 
 	DELIMITER $$
 
@@ -65,13 +67,13 @@
 		VALUES('My New Cart', CONVERT(NOW(), DATE), CONVERT(NOW(), DATE), 1);
 	
 	-- Order
-INSERT INTO placeOrder(payMethod, billAddr, shipAddr, orDate, shipDate, status, totalPrice, accID)
-VALUES('Credit', '703 W Dickson St', '900 N Leverett Ave.', CONVERT(NOW(), DATE), NULL, 'Pending to Pay', 0.00, 1);
+	INSERT INTO placeOrder(payMethod, billAddr, shipAddr, orDate, shipDate, status, totalPrice, accID)
+		VALUES('Credit', '703 W Dickson St', '900 N Leverett Ave.', CONVERT(NOW(), DATE), NULL, 'Pending to Pay', 0.00, 1);
 
 --- Add/delete books from shopping cart
 	-- Adding book
 	INSERT INTO cartContBooks(quantity, cartID, ISBN)
-		VALUES(1, 123, ‘0-553-10354-7’);
+		VALUES(1, 1, ‘978-0-596-15806-4’);
 	
 	-- Delete book [Complete deletion of an entry, not individual books]
 	DELETE FROM cartContBooks
@@ -80,53 +82,61 @@ VALUES('Credit', '703 W Dickson St', '900 N Leverett Ave.', CONVERT(NOW(), DATE)
 -- Merge shopping carts
 	DELIMITER $$
 		CREATE PROCEDURE mergeCart(
-			IN accID INTEGER UNSIGNED,
-			IN name CHAR(20),
-			IN cart1ID INTEGER UNSIGNED, 
-			IN cart2ID INTEGER UNSIGNED, 
-			OUT mergedID INTEGER UNSIGNED)
+			IN @accID INTEGER UNSIGNED,
+			IN @name CHAR(20),
+			IN @cart1ID INTEGER UNSIGNED, 
+			IN @cart2ID INTEGER UNSIGNED, 
+			OUT @mergedID INTEGER UNSIGNED)
 		BEGIN
 			INSERT INTO ShoopingCartManage(dateCreate, dateUpdated, accID, cName)
-				VALUES(CONVERT(NOW(), DATE), NULL, accID, name);
+				VALUES(CONVERT(NOW(), DATE), NULL, @accID, @name);
 
-			SELECT LAST_INSERT_ID() INTO mergedID;
-
-			UPDATE cartContBooks
-				SET cartID = mergeCart
-				WHERE cartID = cart1ID;
+			SELECT LAST_INSERT_ID() INTO @mergedID;
 
 			UPDATE cartContBooks
-				SET cartID = mergeCart
-				WHERE cartID = cart2ID;
+				SET cartID = @mergedID;
+				WHERE cartID = @cart1ID;
+
+			UPDATE cartContBooks
+				SET cartID = @mergedID;
+				WHERE cartID = @cart2ID;
 
 			DELETE FROM ShoppingCartManage
-				WHERE cartID = cart1ID;
+				WHERE cartID = @cart1ID;
 
 			DELETE FROM ShoopingCartManage
-				WHERE cartID = cart2ID;
+				WHERE cartID = @cart2ID;
 		END $$
 
 	DELIMITER ;
--- Change shopping carts as orders
-CREATE PROCEDURE cartToOrder(@accID INTEGER UNSIGNED, @cartID INTEGER UNSIGNED, @billAddr CHAR(40), @payMethod CHAR(12), @shipAddr CHAR(40), @ordID INTEGER UNSIGNED OUTPUT)
+	
+-- Turn shopping carts to orders
+CREATE PROCEDURE cartToOrder(
+	IN @accID INTEGER UNSIGNED, 
+	IN @cartID INTEGER UNSIGNED, 
+	IN @billAddr CHAR(40), 
+	IN @payMethod CHAR(12), 
+	IN @shipAddr CHAR(40), 
+	OUT @ordID INTEGER UNSIGNED)
 BEGIN
 	DECLARE @ordate DATE;
 	DECLARE @totalPrice FLOAT;
 		
 	SET @orDate = CONVERT(NOW(), DATE);
 		
-INSERT INTO placedOrder(payMethod, billAddr, shipAddr, shipDate, orDate, status, accID)
-VALUES(@payMethod, @billAddr, @shipAddr, NULL, @orDate, 'Pending to Pay', @accID);
+	INSERT INTO placedOrder(payMethod, billAddr, shipAddr, shipDate, orDate, status, accID)
+	VALUES(@payMethod, @billAddr, @shipAddr, NULL, @orDate, 'Pending to Pay', @accID);
 		
-	SET @ordID = SELECT LAST_INSERT_ID();
+	SELECT LAST_INSERT_ID() INTO  @ordID;
 		
 	INSERT INTO OrdContBook(ordID, quantity, ISBN)
 		SELECT @ordID, C.quantity, C.ISBN FROM cartContBooks C
 			WHERE cartID = @cartID;
 				
-	SET @totalPrice =  SELECT SUM( O.quantity * B.price) 
-				FROM ordContBook O, Book B
-				WHERE O.ordID = @ordID AND O.ISBN = B.ISBN;
+	SELECT SUM( O.quantity * B.price) 
+		FROM ordContBook O, Book B
+		WHERE O.ordID = @ordID AND O.ISBN = B.ISBN INTO @totalPrice;
+		
 	UPDATE placeOrder
 		SET totalPrice = @totalPrice
 		WHERE ordID = @ordID;
@@ -136,44 +146,44 @@ VALUES(@payMethod, @billAddr, @shipAddr, NULL, @orDate, 'Pending to Pay', @accID
 END;
 
 -- Place the order 
-UPDATE placeOrder
-	SET shipDate = CONVERT(DATE_ADD(NOW(), INTERVAL 3 DAY, DATE), 
-status = 'Ready To Ship'
+	UPDATE placeOrder
+		SET shipDate = CONVERT(DATE_ADD(NOW(), INTERVAL 3 DAY, DATE), 
+		status = 'Ready To Ship'
 		WHERE ordID = 24;
 
 -- Order trace 
-SELECT status FROM placeOrder WHERE ordID = 1;
+	SELECT status FROM placeOrder WHERE ordID = 1;
 
 -- Writ a review
-INSERT INTO review (title, rating, accID, ISBN, comment)
-VALUES ("Amazing Book", 3.5, 1, 023478, 'The book arrived in excellent conditions');
+	INSERT INTO review (title, rating, accID, ISBN, comment)
+		VALUES ("Amazing Book", 3.5, 1, '978-0-14-303858-0', 'The book arrived in excellent conditions');
 	
 -- Edit a written review
 	SELECT comment FROM review 
-		WHERE title = "Amazing Book" AND accID = 1 AND ISBN = ‘0-553-10354-7’;
+		WHERE title = "Amazing Book" AND accID = 1 AND ISBN = '978-0-14-303858-0';
 	
 	UPDATE review 
 		SET comment = 'This is the new comment'
-		WHERE title = "Amazing Book" AND accID = 1 AND ISBN = ‘0-553-10354-7’;
+		WHERE title = "Amazing Book" AND accID = 1 AND ISBN = '978-0-14-303858-0';
 
 -- Total reward points 
-SELECT accID, custName, rwdpoints from Customer;
+	SELECT accID, custName, rwdpoints FROM Customer;
 
 -- Functions for employees:
--- List book information (e.g., title, author, price) and quantity-in-stock of    chosen books
-SELECT title, author, price, stock from Books 
-WHERE ISBN='0-553-10354-7','0-553-10354-12';
+-- List book information (e.g., title, author, price) and quantity-in-stock of chosen books
+	SELECT title, author, price, stock FROM Books 
+	WHERE ISBN = '978-0-393-09219-6' OR ISBN = '978-0-517-02530-7';
 
 --List information about those orders assigned to him/her
-SELECT * from placeorder O,employeeMonMan E 
-		WHERE O.ordID=  E.ordID;
-Update order status
+	SELECT * FROM placeorder O, employeeMonMan E 
+		WHERE O.ordID = E.ordID;
+	UPDATE order status
 	UPDATE placeOrder SET status='shipped' 
-WHERE status='ready to ship';
+	WHERE status='ready to ship';
 
 -- Insert new books
 INSERT INTO Books (category, autName , year, ISBN, title, edit, publisher, stock, price)
- VALUES (‘High Fantasy’, ‘George R.R Martin’, 1996, ‘0-553-10354-7’, ‘Game of Thrones’, 2, ‘Bantam Spectra’, 2, 15.98);
+ VALUES ( 'Science Fiction & Fantasy', 'George R.R Martin', 1996, '978-1-5247-9628-0', 'Fire and Blood: 300 Years Before A Game of Thrones’, 1, 'Bantam Spectra', 10, 15.98);
 
 -- Update the rating of a book
 UPDATE book 
@@ -182,35 +192,39 @@ SET avgRating = (SELECT AVG(r.rating) FROM review r, book b WHERE r.ISBN=b.ISBN)
 -- Obtained reward points
 UPDATE Customer
 	SET rwdPoint = rwdPoint + (SELECT totalPrice * 0.1 
-FROM placeOrder
-	WHERE accID = 1 AND orderID = 2)
+		FROM placeOrder
+		WHERE accID = 1 AND orderID = 2)
 	WHERE accID = 1;
 
 -- Applying reward points
-CREATE PROCEDURE applyRwdPoints(@accID INTEGER UNSIGNED, @ordID INTEGER UNSIGNED)
-BEGIN
-	DECLARE @rwdPoint FLOAT;
-	DECLARE @orderPrice FLOAT;
-		
-	SET @rwdPoint =  SELECT rwdPoint FROM Customer WHERE accID = @accID;
-SET @orderPrice = SELECT totalPrice FROM placeOrder WHERE ordID = @orderID;
-		
-	IF @rwdPoint <= @orderPrice THEN
-		SET @orderPrice = @orderPrice - @rwdPoint;
-		SET @rwdPoint = 0.0;
-	ELSE
-		SET @rwdPoint = @rwdPoint - @orderPrice;
-		SET @orderPrice = 0.0;
-	END IF;
-		
-	UPDATE Customer
-		SET rwdPoint = @rwdPoint
-		WHERE accID = @accID;
-		
-	UPDATE placeOrder
-		SET totalPrice = @orderPrice
-		WHERE ordID = @ordID;
-END;
+	DELIMITER $$
+	CREATE PROCEDURE applyRwdPoints(
+		IN accID INTEGER UNSIGNED,
+		IN ordID INTEGER UNSIGNED)
+	BEGIN
+		DECLARE rwdPoint FLOAT;
+		DECLARE orderPrice FLOAT;
+
+		SELECT C.rwdPoint FROM Customer C WHERE C.accID = accID INTO rwdPoint;
+		SELECT P.totalPrice FROM placeOrder P WHERE P.ordID = orderID INTO orderPrice;
+
+		IF rwdPoint <= orderPrice THEN
+			SET orderPrice = orderPrice - rwdPoint;
+			SET rwdPoint = 0.0;
+		ELSE
+			SET rwdPoint = rwdPoint - orderPrice;
+			SET orderPrice = 0.0;
+		END IF;
+
+		UPDATE Customer C
+			SET C.rwdPoint = rwdPoint
+			WHERE C.accID = accID;
+
+		UPDATE placeOrder P
+			SET P.totalPrice = orderPrice
+			WHERE P.ordID = ordID;
+	END $$
+	DELIMITER ;
 
 -- Functions for analysts
 -- What types of books are better sold in the second quarter than the first quarter?
