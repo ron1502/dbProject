@@ -2,51 +2,54 @@
 -- For Customers
 -- New user account registration
 
-DROP PROCEDURE IF EXISTS newUser;
-DROP PROCEDURE IF EXISTS logIn;
+	DROP PROCEDURE IF EXISTS newUser;
+	DROP PROCEDURE IF EXISTS logIn;
+	DROP PROCEDURE IF EXISTS mergeCart;
 
-DELIMITER $$
+	DELIMITER $$
 
-CREATE PROCEDURE newUser(
-	IN email VARCHAR(25),
-	IN custName VARCHAR(20),
-	IN phoneNo VARCHAR(12),
-	IN zipCode MEDIUMINT UNSIGNED,
-	IN street VARCHAR(30),
-	IN city VARCHAR(20),
-	IN state VARCHAR(10),
-	IN password VARCHAR(32),
-	OUT error VARCHAR(2),
-	OUT accID INTEGER UNSIGNED) 
+	CREATE PROCEDURE newUser(
+		IN email VARCHAR(25),
+		IN custName VARCHAR(20),
+		IN phoneNo VARCHAR(12),
+		IN zipCode MEDIUMINT UNSIGNED,
+		IN street VARCHAR(30),
+		IN city VARCHAR(20),
+		IN state VARCHAR(10),
+		IN password VARCHAR(32),
+		OUT error VARCHAR(2),
+		OUT accID INTEGER UNSIGNED) 
 
-BEGIN
-	DECLARE hPassword VARCHAR(32);
-	IF EXISTS(SELECT C.email FROM Customer C WHERE C.email = email) THEN
-		SET error = "E";
-		SET accID = 0;
-	ELSE
-		SELECT MD5(password) INTO hPassword;
-		INSERT INTO Customer(email ,custName, phoneNo, zipCode, street, city, state, password)
-		VALUES(email ,custName, phoneNo, zipCode, street, city, state, hPassword);
-		SELECT LAST_INSERT_ID() INTO accID;
-		SET error = "S";
-	END IF;
-END $$
+	BEGIN
+		DECLARE hPassword VARCHAR(32);
+		IF EXISTS(SELECT C.email FROM Customer C WHERE C.email = email) THEN
+			SET error = "E";
+			SET accID = 0;
+		ELSE
+			SELECT MD5(password) INTO hPassword;
+			INSERT INTO Customer(email ,custName, phoneNo, zipCode, street, city, state, password)
+			VALUES(email ,custName, phoneNo, zipCode, street, city, state, hPassword);
+			SELECT LAST_INSERT_ID() INTO accID;
+			SET error = "S";
+		END IF;
+	END $$
 
-DELIMITER ;
 -- User login
 
-CREATE PROCEDURE logIn(
-	IN email VARCHAR(25),
-	IN password VARCHAR(32),
-	OUT accID INTEGER UNSIGNED)
-BEGIN
-	SELECT C.accID FROM Customer C WHERE C.email = email AND C.password = MD5(password) INTO accID;
-END $$
+	CREATE PROCEDURE logIn(
+		IN email VARCHAR(25),
+		IN password VARCHAR(32),
+		OUT accID INTEGER UNSIGNED)
+	BEGIN
+		SELECT C.accID FROM Customer C WHERE C.email = email AND C.password = MD5(password) INTO accID;
+	END $$
+
+	DELIMITER ;
 
 -- User can update his address, password etc.
-UPDATE Customer 
-SET zipCode = 72722, street = 'Garland', city =  'New York City', state = 'New York', password = MD5('NewUnknown'), phoneNo = '479-333-666'
+	
+	UPDATE Customer 
+	SET zipCode = 72722, street = 'Garland', city =  'Fayetteville', state = 'Arkansas', password = MD5('NewPassword'), phoneNo = '479-333-666'
 	WHERE accID = 1;
 
 -- Book search (by author name, title, category, year or combinations)
@@ -75,28 +78,35 @@ VALUES('Credit', '703 W Dickson St', '900 N Leverett Ave.', CONVERT(NOW(), DATE)
 		WHERE ISBN = ‘0-553-10354-7’ AND cartID = 123;
 
 -- Merge shopping carts
-CREATE PROCEDURE mergeCart(@accID INTEGER UNSIGNED, @name CHAR(20), @cart1ID INTEGER UNSIGNED, @cart2ID INTEGER UNSIGNED, @mergedID INTEGER UNSIGNED OUTPUT)
-BEGIN
-	INSERT INTO ShoopingCartManage(dateCreate, dateUpdated, accID, cName)
-		VALUES(CONVERT(NOW(), DATE), NULL, @accID, @name);
-		
-	SET @mergedID = SELECT LAST_INSERT_ID();
-		
-	UPDATE cartContBooks
-		SET cartID = @mergeCart
-		WHERE cartID = @cart1ID;
-		
-	UPDATE cartContBooks
-		SET cartID = @mergeCart
-		WHERE cartID = @cart2ID;
-		
-	DELETE FROM ShoppingCartManage
-		WHERE cartID = @cart1ID;
-		
-	DELETE FROM ShoopingCartManage
-		WHERE cartID = @cart2ID;
-END;
+	DELIMITER $$
+		CREATE PROCEDURE mergeCart(
+			IN accID INTEGER UNSIGNED,
+			IN name CHAR(20),
+			IN cart1ID INTEGER UNSIGNED, 
+			IN cart2ID INTEGER UNSIGNED, 
+			OUT mergedID INTEGER UNSIGNED)
+		BEGIN
+			INSERT INTO ShoopingCartManage(dateCreate, dateUpdated, accID, cName)
+				VALUES(CONVERT(NOW(), DATE), NULL, accID, name);
 
+			SELECT LAST_INSERT_ID() INTO mergedID;
+
+			UPDATE cartContBooks
+				SET cartID = mergeCart
+				WHERE cartID = cart1ID;
+
+			UPDATE cartContBooks
+				SET cartID = mergeCart
+				WHERE cartID = cart2ID;
+
+			DELETE FROM ShoppingCartManage
+				WHERE cartID = cart1ID;
+
+			DELETE FROM ShoopingCartManage
+				WHERE cartID = cart2ID;
+		END $$
+
+	DELIMITER ;
 -- Change shopping carts as orders
 CREATE PROCEDURE cartToOrder(@accID INTEGER UNSIGNED, @cartID INTEGER UNSIGNED, @billAddr CHAR(40), @payMethod CHAR(12), @shipAddr CHAR(40), @ordID INTEGER UNSIGNED OUTPUT)
 BEGIN
