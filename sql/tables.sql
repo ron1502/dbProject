@@ -108,7 +108,7 @@ CREATE TABLE employeeMonMan(
 	salary FLOAT UNSIGNED,
 	name CHAR(20),
 	empAddress CHAR(40),
-	rank ENUM('monitor', 'manager'),
+	rank ENUM('Regular', 'Manager'),
 	ordID INTEGER UNSIGNED,
 	empID INTEGER UNSIGNED ZEROFILL AUTO_INCREMENT,
 	PRIMARY KEY(empID),
