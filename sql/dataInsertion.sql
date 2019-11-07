@@ -55,3 +55,35 @@ INSERT INTO Book(category, autName, year, ISBN, title, edition, publisher, stock
           'Scholastic Press', 15, 0, 11.00),
     	('Science Fiction & Fantasy', 'J.R.R. Tolkien', 1997, '978-0-618-00221-4','The Hobbit: or There and Back Again', 1,
           'Houghton Mifflin Company', 30, 0, 20.30);
+
+INSERT INTO review(title,rating,accID,comment,ISBN)
+VALUES ('Fun', 3.5, 4, 'Enjoyed reading the book','0-06-098915-7'),
+	('Inspiring', 5.0, 3, 'Inspiring story','978-1-4516-4854-6'),
+	('Excellent', 4.5, 2,'Excellent classic read','978-0-618-00221-4'),
+	('Good', 3.8, 1, 'Very interesting, loved every part of it','978-0-345-53943-4');
+
+INSERT INTO cartContBooks(quantity,cartID,ISBN)
+VALUES (2,1,'978-1-4516-4854-6'),
+	(1,2,'978-0-14-303858-0'),
+	(1,2,'978-0-545-13970-0'),
+	(1,3,'978-0-618-00221-4');
+
+INSERT INTO placeOrder(payMethod,billAddr,shipAddr,shipDate,orDate,status,totalPrice,ordID,accID)
+VALUES ('Credit Card','300N Garland Avenue, Apt 12, 72701,Arkansas','300N Garland Avenue, Apt 12, 72701, Arkansas','2019-11-01','2019-10-24','Delivered',65.99,1,1),
+	('Credit Card','300N Garland Avenue, Apt 12, 72701,Arkansas','160 Broadway, 10038, New York','2019-11-20','2019-11-04','Pending to Pay',1280.00,2,1),
+	('Credit Card','700 N. West 13th Ave., Pine Bluff,Arkansas','300N Garland Avenue, Apt 12,72701, Arkansas','2019-11-12','2019-11-06','Ready to Ship',30.68,3,1),
+	('Credit Card','300 S. Creston Drive,Oklahoma City,Oklahoma,73008','300 S. Creston Drive, Oklahoma City, Oklahoma, 73008','2019-11-09','2019-10-30','Shipped',54.66,4,1);
+
+INSERT INTO OrdContBook(quantity,ordID,ISBN)
+VALUES (2,2,'978-1-4516-4854-6'),
+	(1,2,'978-0-14-303858-0'),
+	(1,2,'978-0-545-13970-0'),
+	(1,4,'978-0-618-00221-4');
+
+INSERT INTO employeeMonMan(salary,name,empAddress,rank,ordID)
+VALUES (300,'Steve Young',',72702,Arkansas','Regular',1),
+	(750,'Daisy Johnson','135N Leverett Ave,72703,Arkansas','Manager',2),
+	(350,'Monica Jones','750N Trout Dr,72701,Arkansas','Regular',3),
+	(300,'Cara Sanders','72703,Arkansas','Regular',4),
+	(675,'John Green','72703,Arkansas','Manager', NULL),
+	(350,'Kelly Brooks','72703,Arkansas','Regular', NULL);
