@@ -53,5 +53,5 @@ INSERT INTO Book(category, autName, year, ISBN, title, edition, publisher, stock
           'Scholastic Press', 12, 0, 10.50),
     	('Science Fiction & Fantasy', 'Suzanne Collins', 2012, '978-0-545-42511-7',  'The Hunger Games: Movie Tie-in Edition', 1,
           'Scholastic Press', 15, 0, 11.00),
-    	('Science Fiction & Fantasy', 'J.R.R. Tolkien', 1997, ' 978-0-618-00221-4','The Hobbit: or There and Back Again', 1,
+    	('Science Fiction & Fantasy', 'J.R.R. Tolkien', 1997, '978-0-618-00221-4','The Hobbit: or There and Back Again', 1,
           'Houghton Mifflin Company', 30, 0, 20.30);
