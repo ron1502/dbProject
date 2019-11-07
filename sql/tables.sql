@@ -85,8 +85,8 @@ CREATE TABLE cartContBooks(
 -- Decided to join OrderAndPlaces and join EmployeeMonitorsManagers
 CREATE TABLE placeOrder(
 	payMethod CHAR(12),
-	billAddr CHAR(40),
-	shipAddr CHAR(40),
+	billAddr CHAR(128),
+	shipAddr CHAR(128),
 	shipDate DATE,
 	orDate	DATE,
 	status ENUM('Pending to Pay','Ready To Ship', 'Shipped', 'Delivered', 'Picked Up'),
