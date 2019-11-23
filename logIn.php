@@ -1,4 +1,5 @@
 <?php
-	$connectionString =  getenv("MYSQLCONNSTR_localdb");
-	echo $connectionString;
+	$connData = Array();
+	parse_str(str_replace(";", "&", getenv("MYSQLCONNSTR_localdb")), $connData);
+	echo $connData;
 ?>
