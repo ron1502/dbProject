@@ -6,7 +6,7 @@
 
 
 	// Create connection
-	$conn = new mysqli($connData["Data_Source"], $connData["User_id"], $connData["Password"]);
+	$conn = new mysqli($connData["Data_Source"], $connData["User_Id"], $connData["Password"]);
 
 	// Check connection
 	if ($conn->connect_error) {
