@@ -13,10 +13,10 @@
 	if(isset($_POST["funct"])){
 		switch($_POST["funct"]){
 			case "logIn":
-				logInUser();
+				echo logInUser();
 				break;
 			case "signIn":
-				signInUser();
+				echo signInUser();
 				break;
 		}
 	}
