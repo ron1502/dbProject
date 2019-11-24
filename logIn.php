@@ -26,7 +26,7 @@
 	}
 	
 	
-	function logInUser($email, $passworrd){
+	function logInUser(){
 		$id = null;
 		$logInQuery = "logIn(". $_POST["email"] . "," . $_POST["passworrd"]. ");";
 		$logInQuery .= "SELECT @accID AS accountID";
