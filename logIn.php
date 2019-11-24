@@ -15,9 +15,11 @@
 	if(isset($_POST["funct"])){
 		switch($_POST["funct"]){
 			case "logIn":
+				echo "Login user";
 				echo logInUser();
 				break;
 			case "signIn":
+				echo "SignIn user";
 				echo signInUser();
 				break;
 		}
@@ -30,7 +32,7 @@
 		$logInQuery .= "SELECT @accID AS accountID";
 	
 		$db->multi_query($logInQuery);
-	
+		echo "Selecting from database";
 		$id = $db->store_result()->fetch_object()->accountID;
 		return $id;
 	}
