@@ -6,8 +6,8 @@
 	// Create connection
 	$db = new mysqli($connData["Data_Source"], $connData["User_Id"], $connData["Password"]);
 	
-	if ($conn->connect_error) {
-		die("Connection failed: " . $conn->connect_error);
+	if ($db->connect_error) {
+		die("Connection failed: " . $db->connect_error);
 	}
 	
 	if(isset($_POST["funct"])){
