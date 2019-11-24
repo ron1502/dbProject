@@ -10,6 +10,8 @@
 		die("Connection failed: " . $db->connect_error);
 	}
 	
+	$db->select_db('localdb');
+	
 	if(isset($_POST["funct"])){
 		switch($_POST["funct"]){
 			case "logIn":
@@ -21,7 +23,6 @@
 		}
 	}
 	
-	$db->select_db('localdb');
 	
 	function logInUser($email, $passworrd){
 		$id = null;
