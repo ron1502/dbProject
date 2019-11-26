@@ -1,8 +1,8 @@
 <?php
-	$db = getDBConnection();
+	$db = getTestDBConnection();
 	/*
 	$_POST["email"] = "richard@gmail.com";
-	$_POST["password"] = "dfas4";
+	$_POST["password"] = "dfas452";
 	$_POST["funct"] = "logIn";
 	*/
 	if(isset($_POST["funct"])){
@@ -24,7 +24,9 @@
 			$db->next_result(); //Obtaining result from CALL
 			$accID = $db->store_result()->fetch_object()->accountID;
 			if($accID == null) return -1;
-			else return (int) $accID;
+			else{
+				return $accID;
+			}
 		} else{
 			echo "We ran into problems\n";
 			return -1;
