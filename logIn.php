@@ -1,5 +1,5 @@
 <?php
-	$db = getTestDBConnection();
+	$db = getDBConnection();
 	/*
 	$_POST["email"] = "richard@gmail.com";
 	$_POST["password"] = "dfas452";
