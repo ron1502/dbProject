@@ -14,6 +14,9 @@
 			case "signUp":
 				echo signUpUser($db);
 				break;
+			case "getUserData":
+				echo getUserData($db);
+				break;
 		}
 	}
 	$db->close();
@@ -45,6 +48,16 @@
 			else return $result->accID;
 		}
 		return -2;
+	}
+	
+	function getUserData($db){
+		$userDataQuery = "SELECT * FROM Customer WHERE accID = " . $_POST["accID"] . ";";
+		if($result = $db->query($userDataQuery)){
+			$userData = $result->fetch_object();
+			$jsonUser = '{"name": "' . $userData->custName .'",' .
+						  '"points": '. $userData->rwdPoint .'}';
+			return $jsonUser;
+		}
 	}
 	
 

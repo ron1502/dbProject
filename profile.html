@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Modern Business - Start Bootstrap Template</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/modern-business.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/jdenticon@2.2.0" async>
+	</script>
+	<style>
+		#userImg {
+			display: block;
+			margin-left: auto; 
+			margin-right: auto; 
+			width: 35%;
+		}
+		.centerText{
+			text-align: center
+		}
+	</style>
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">NeroBookStore</a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+			<li class = "nav-item dropdown" id="loggedInMenu">
+			    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownBlog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<img src="images/account_circle-24px.svg">
+				</a>
+				<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownPortfolio">
+					<a class="dropdown-item">Profile</a>
+					<a class="dropdown-item">
+						<button type="button" class="btn btn-outline-primary btn-block" onclick="logOut()">LogOut</button>
+					</a>
+				</div>
+			</li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  
+  <!-- Page Content -->
+	<div class="container">
+		<h2 class="my-4" id="greeting"> Welcome Back!!</h2>
+
+		<hr>
+
+		<div class="row">
+			<div class="col-lg-4" style="background-color: grey;" id="UserInfo">
+				<div>
+					<svg data-jdenticon-value="0" id="userImg"> </svg>
+				</div>
+				<div>
+					<h3 id="userName" class="centerText"></h3>
+					<h4 id="rwdPoints" class="centerText"></h4>
+				</div>
+			</div>
+			<div class="col">
+				<hr>
+				<h2 class="centerText"> Carts <h2>
+				<hr>
+				<div class=col>
+				<div>
+			</div>
+		</div>
+		
+	</div>
+	<script src="vendor/jquery/jquery.min.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script>
+		setupUserData()
+		
+		function AJAX(response, data, file){
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = response;
+			xhttp.open("POST", file, true);
+			xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			xhttp.send(data);
+		}
+		
+		function setupUserData(){
+			var accountID = window.localStorage.getItem("accountID");
+			if(accountID == null){
+				window.alert("logIn is required first!!")
+				window.location.replace("index.html")
+			}else{
+				var dataQuery = "funct=getUserData&accID=" + accountID;
+				document.getElementById("userImg").setAttribute("data-jdenticon-value", accountID)
+				var file = "account.php"
+				var response = function(){
+					if (this.readyState == 4 && this.status == 200) {
+						if(this.responseText.length > 0){
+							var accountInfo = JSON.parse(this.responseText);
+							document.getElementById("userName").innerHTML = accountInfo.name;
+							document.getElementById("rwdPoints").innerHTML = "Points: " + accountInfo.points;
+						}
+					}
+				}
+				AJAX(response, dataQuery, file);
+			}
+		}
+		
+		function logOut(){
+			window.localStorage.removeItem("accountID");
+			window.location.replace("index.html")
+		}
+		
+	</script>
+</body>
+
+</html>
