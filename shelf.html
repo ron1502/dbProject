@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Modern Business - Start Bootstrap Template</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/modern-business.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/jdenticon@2.2.0" async>
+	</script>
+	<style>
+
+		.centerText{
+			text-align: center
+		}
+		
+		.filterFont{
+			color: white
+		}
+	</style>
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">NeroBookStore</a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+			<li class = "nav-item dropdown" id="loggedInMenu">
+			    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownBlog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<img src="images/account_circle-24px.svg">
+				</a>
+				<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownPortfolio">
+					<a class="dropdown-item">Profile</a>
+					<a class="dropdown-item">
+						<button type="button" class="btn btn-outline-primary btn-block" onclick="logOut()">LogOut</button>
+					</a>
+				</div>
+			</li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  
+  <!-- Page Content -->
+	<div class="container">
+		<h2 class="my-4 centerText" id="greeting"> Book Shelf </h2>
+
+		<hr>
+
+		<div class="row">
+			<div class="col-lg-4" style="background-color: #343a40;" id="UserInfo">
+				<h4 class="centerText filterFont mt-3">Filters</h4>
+				<div class="form-check form-check-inline mt-2">
+				  <input class="form-check-input position-static" type="checkbox" id="cbTitle" onclick=disable(0)>
+				  <input type="text" class="form-control" placeholder="Title" id="title">
+				</div>
+				<div class="form-check form-check-inline mt-3">
+				  <input class="form-check-input position-static" type="checkbox" id="cbAuthor" onclick=disable(1)>
+				  <input type="text" class="form-control" placeholder="Author" id="author">
+				</div>
+				<div class="form-check form-check-inline mt-3 mb-3">
+				  <input class="form-check-input position-static" type="checkbox" id="cbPublisher" onclick=disable(2)>
+				  <input type="text" class="form-control" placeholder="Publisher" id="publisher">
+				</div>
+				<div class="input-group mb-2">
+					<button class="btn btn-primary btn-block" type="button" onclick="searchBook()">Search</button>
+				</div>
+			</div>
+			<div class="col-lg-8" id="bookContainer">
+			</div>
+		</div>
+		
+	</div>
+	<script src="vendor/jquery/jquery.min.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script>
+		var checkBoxes = [[document.getElementById("cbTitle"), document.getElementById("title")],
+						  [document.getElementById("cbAuthor"), document.getElementById("author")],
+						  [document.getElementById("cbPublisher"), document.getElementById("publisher")]];
+		setup();
+		
+		function searchBook(){
+			var bookInfo =	'<div class="col-lg-4 col-sm-6 mb-3">' +
+							'	<div class="card h-100">' +
+							'		<div class="book mt-3 rounded"> </div>' +
+							'		<div class="card-body">'+
+							'		<h4 class="card-title">'+
+							'			<a href="">[BookName]</a>'+
+							'		</h4>'+
+							'		<ul class="list-group list-group-flush">'+
+							'			<li class="list-group-item">by [AuthorName] </li>'+
+							'			<li class="list-group-item"> Price: $[Price] </li>'+
+							'			<button class="btn btn-primary btn-block" type="button" onclick=addtoCart("[ISBN]")> Add To Cart </button>'+
+							'		</ul>'+
+							'	</div>'+
+							'	</div>'+
+							'</div>';
+			var bookContainer = document.getElementById("bookContainer");
+			var queryData = "bookOP=searchBook&title=" + checkBoxes[0][1].value +
+							"&autName=" + checkBoxes[1][1].value +
+							"&publisher=" + checkBoxes[2][1].value ;
+			console.log("Data sent: " + queryData)
+			var response = function(){
+				if (this.readyState == 4 && this.status == 200) {
+					bookContainer.innerHTML = "";
+					if(this.responseText.length == 0) return;
+					var response = JSON.parse(this.responseText);
+					for(var i = 0; i < response.length; i++){
+						var newBook = bookInfo;
+						newBook = newBook.replace("[AuthorName]", response[i].autName);
+						newBook = newBook.replace("[BookName]", response[i].title);
+						newBook = newBook.replace("[Price]", response[i].price);
+						newBook = newBook.replace("[ISBN]", response[i].ISBN);
+						//initialize newBook with some info
+						bookContainer.innerHTML +=  newBook;
+					}
+				}
+			}
+			AJAX(response, queryData, "book.php");
+		}
+		
+		function addToCart(ISBN){
+		
+		}
+		
+		function disable(index){
+			if(checkBoxes[index][0].checked){
+				checkBoxes[index][1].disabled =  false;
+			}else{
+				checkBoxes[index][1].disabled =  true;
+				checkBoxes[index][1].value = "";
+			}
+		}
+		function AJAX(response, data, file){
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = response;
+			xhttp.open("POST", file, true);
+			xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			xhttp.send(data);
+		}
+		
+		function setup(){
+			checkBoxes[0][0].checked = true;
+			disable(1);
+			disable(2);
+		}
+		
+		function logOut(){
+			window.localStorage.removeItem("accountID");
+			window.location.replace("index.html");
+		}
+	</script>
+</body>
+
+</html>
