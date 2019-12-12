@@ -19,11 +19,7 @@
 			xhttp.open("POST", file, true);
 			xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 			xhttp.send(data);
-		}
-		
-		function sendData(){
-			
-		}
+		} 
 		
 		const invalidField = "form-control is-invalid";
 		const validField = "form-control is-valid";
@@ -46,20 +42,78 @@
 			var passwordF = document.getElementById("password");
 			if(passwordF.value.length > 7){
 				passwordF.setAttribute("class", validField);
-				isPwdValid =  true;
+				return true;
 			} else{
 				passwordF.setAttribute("class", invalidField);
-				isPwdValid =  false;
+				return false;
 			}
-			return isPwdValid;
 		}
 				
-		function isEmailValid(email){
+		function isEmailValid(){
 			var emailF = document.getElementById("email");
 			if(/\S+@\S+\.\S+/i.test(emailF.value)){
 				emailF.setAttribute("class", validField);
+				return true;
 			}else{
 				emailF.setAttribute("class", invalidField);
+				return false;
+			}
+		}
+		
+		function isNameValid(){
+			var nameF = document.getElementById("name");
+			if(nameF.value.length > 0){
+				nameF.setAttribute("class", validField);
+				return true;
+			}
+			else{
+				nameF.setAttribute("class", invalidField);
+				return false;
+			}
+		}
+		
+		function isPhoneValid(){
+			var phoneF =  document.getElementById("phoneNum");
+			if(phoneF.value.length == 12 && /\d{3}-\d{3}-\d{4}/.test(phoneF.value)){
+				phoneF.setAttribute("class", validField);
+				return true;
+			}else{
+				phoneF.setAttribute("class", invalidField);
+				return false;
+			}
+		}
+		
+		function signUp(){
+			if(isEmailValid() && pAreEqual() && pwdValid() && isEmailValid() && isNameValid()){
+				var newUserData = "funct=signUp&email=" + document.getElementById("email").value +
+								  "&custName=" + document.getElementById("name").value +
+								  "&phoneNum=" + document.getElementById("phoneNum").value +
+								  "&zipcode=" + document.getElementById("zipcode").value +
+								  "&city=" + document.getElementById("city").value +
+								  "&street=" + document.getElementById("street").value +
+								  "&state=" + document.getElementById("state").value +
+								  "&password=" + document.getElementById("password").value;
+				document.getElementById("errorMsg").style.display="none";
+				var file = "logIn.php"
+				var response = function(){
+					var accountID = 0;
+					if (this.readyState == 4 && this.status == 200) {
+						window.alert(this.responseText);
+						accountID = Number(this.responseText);
+						if(accountID == -1){
+							console.log("Account already exists");
+							document.getElementById("emailRegistered").style.display="block";
+						}else if(accountID == -2) window.alert("We ran into problems on the server side. Our appologies");
+						else{
+							document.getElementById("emailRegistered").style.display="none";
+							window.localStorage.setItem("accountID", accountID);
+							window.location.replace("index.html");
+						}
+					}
+				}
+				AJAX(response, newUserData, file);
+			}else{
+				document.getElementById("errorMsg").style.display="block";
 			}
 		}
 	</script>
@@ -74,7 +128,6 @@
 			<div class="card text-center mt-5">
 				<div class="card-body">
 					<h5 class="card-header">Sign Up</h5>
-					
 					<br>
 					<h5 class="card-title text-left">Log In Info</h5>
 					<div class="input-group mb-2 mt-2">
@@ -99,10 +152,13 @@
 					<br>
 					<h5 class="card-title text-left">Personal Data</h5>
 					<div class="input-group mb-2 mt-2">
-							<input type="text" class="form-control" placeholder="Name" id="name">
+							<input type="text" class="form-control" placeholder="Name" id="name" onblur="isNameValid()">
 					</div>
 					<div class="input-group mb-2">
-							<input type="text" class="form-control" placeholder="Phone Number" id="phoneNum">
+							<input type="text" class="form-control" placeholder="Phone Number" id="phoneNum" onblur="isPhoneValid()">
+							<div class="invalid-feedback">
+								Phone number is not of the form 666-666-6666
+ 							</div>
 					</div>
 					
 					<br>
@@ -120,11 +176,14 @@
 							<input type="text" class="form-control" placeholder="Zipcode" id="zipcode">
 					</div>
 					<div class="alert alert-primary" role="alert" style="display:none" id="errorMsg" >
-						Either the email or password introduced are not correct!
+						Fix the errors before continuing!
+					</div>
+					<div class="alert alert-primary" role="alert" style="display:none" id="emailRegistered" >
+						OOPSIE someone is already registered with this account
 					</div>
 					<br>
 					<div class="input-group mb-2">
-						<button class="btn btn-primary btn-block" type="button" onclick="SignUp()">Sign Up</button>
+						<button class="btn btn-primary btn-block" type="button" onclick="signUp()">Sign Up</button>
 					</div>
 				</div>
 			</div>

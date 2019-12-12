@@ -11,8 +11,8 @@
 			case "logIn":
 				echo logInUser($db);
 				break;
-			case "signIn":
-				echo signInUser($db);
+			case "signUp":
+				echo signUpUser($db);
 				break;
 		}
 	}
@@ -29,14 +29,22 @@
 				return $accID;
 			}
 		} else{
-			echo "We ran into problems\n";
-			return -1;
+			return -2;
 		}
 	}
 	
-	function signInUser($db){
-		$id = null;
-		return $id;
+	function signUpUser($db){
+		$signUpQuery = "CALL newUser('". $_POST["email"] ."', '". $_POST["custName"] ."', " .
+					   "'" . $_POST["phoneNum"] . "', " . $_POST["zipcode"] . ", '" . $_POST["street"] . "', " .
+					   "'". $_POST["city"] ."', '". $_POST["state"] . "', '" . $_POST["password"] . "', @error, @accID);";
+		$signUpQuery .= "SELECT @error AS errorMsg, @accID AS accID;";
+		if($db->multi_query($signUpQuery)){
+			$db->next_result(); //Skiping the call process
+			$result = $db->store_result()->fetch_object();
+			if($result->errorMsg == "E") return -1;
+			else return $result->accID;
+		}
+		return -2;
 	}
 	
 
