@@ -179,7 +179,7 @@
 							'	</div>'+
 							'</div>';
 			var bookContainer = document.getElementById("bookContainer");
-			var queryData = "bookOP='getSomeBooks'&bookQuant=10";
+			var queryData = "bookOP=getSomeBooks&bookQuant=10";
 			var response = function(){
 				if (this.readyState == 4 && this.status == 200) {
 					console.log(this.responseText);
